@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Compiled files
+dist/
+*.tsbuildinfo
+
+# Environment variables
+.env
+*.env
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Uploads (ignore transient uploaded files, keep sample audio)
+uploads/*
+!uploads/delhi_dialogue_sample.wav
+!uploads/voxalign-data.json
+!uploads/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db

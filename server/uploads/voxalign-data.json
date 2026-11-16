@@ -1,0 +1,16 @@
+{
+  "users": [
+    {
+      "id": "usr_6ed3e37d",
+      "email": "test_annotator@voxalign.ai",
+      "password": "hashed_password_xyz",
+      "name": "Test Annotator",
+      "role": "user",
+      "createdAt": "2026-11-16T16:43:21.854Z",
+      "updatedAt": "2026-11-16T16:43:21.864Z"
+    }
+  ],
+  "projects": [],
+  "audioFiles": [],
+  "auditLogs": []
+}

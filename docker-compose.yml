@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  voxalign-client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"
+    depends_on:
+      - voxalign-server
+    environment:
+      - VITE_API_URL=http://localhost:5000
+    networks:
+      - voxalign-network
+
+  voxalign-server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - MONGODB_URI=mongodb://mongodb:27017/voxalign
+      - REDIS_URL=redis://redis:6379
+      - AI_SERVICE_URL=http://voxalign-ai-service:8000
+      - JWT_SECRET=voxalign_super_secure_production_secret_key_2026
+      - CORS_ORIGIN=http://localhost:5173
+    volumes:
+      - uploads_data:/app/uploads
+    depends_on:
+      - mongodb
+      - redis
+      - voxalign-ai-service
+    networks:
+      - voxalign-network
+
+  voxalign-ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - voxalign-network
+
+  mongodb:
+    image: mongo:7.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - voxalign-network
+
+  redis:
+    image: redis:7.2-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - voxalign-network
+
+networks:
+  voxalign-network:
+    driver: bridge
+
+volumes:
+  mongo_data:
+  redis_data:
+  uploads_data:

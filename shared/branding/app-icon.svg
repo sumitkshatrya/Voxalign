@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%" fill="none">
+  <defs>
+    <linearGradient id="appBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#172538" />
+      <stop offset="100%" stop-color="#0B1422" />
+    </linearGradient>
+    <linearGradient id="appGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#52DDBB" />
+      <stop offset="100%" stop-color="#64C8FF" />
+    </linearGradient>
+    <radialGradient id="appGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#52DDBB" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#0B1422" stop-opacity="0" />
+    </radialGradient>
+    <filter id="iconFilter" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- App Squircle -->
+  <rect width="512" height="512" rx="115" fill="url(#appBg)" />
+  <rect x="2" y="2" width="508" height="508" rx="113" stroke="url(#appGrad)" stroke-width="3" stroke-opacity="0.35" />
+
+  <!-- Background radial ambiance -->
+  <circle cx="256" cy="256" r="220" fill="url(#appGlow)" />
+
+  <!-- Logo Icon Scaled Up -->
+  <g transform="translate(68, 64) scale(3.8)" filter="url(#iconFilter)">
+    <path d="M14 18 L32 18 L50 68 L41 68 Z" fill="url(#appGrad)" />
+    <path d="M86 18 L68 18 L50 68 L59 68 Z" fill="url(#appGrad)" />
+
+    <circle cx="50" cy="78" r="4.5" fill="#52DDBB" />
+    <line x1="50" y1="68" x2="50" y2="78" stroke="#52DDBB" stroke-width="2.5" stroke-dasharray="1 1" />
+
+    <rect x="36" y="34" width="3.5" height="18" rx="1.75" fill="url(#appGrad)" />
+    <circle cx="37.75" cy="34" r="2" fill="#52DDBB" />
+
+    <rect x="43" y="24" width="3.5" height="34" rx="1.75" fill="url(#appGrad)" />
+    <circle cx="44.75" cy="24" r="2" fill="#64C8FF" />
+
+    <rect x="50" y="16" width="3.5" height="46" rx="1.75" fill="url(#appGrad)" />
+    <circle cx="51.75" cy="16" r="2.5" fill="#F5F8FC" />
+
+    <rect x="57" y="24" width="3.5" height="34" rx="1.75" fill="url(#appGrad)" />
+    <circle cx="58.75" cy="24" r="2" fill="#64C8FF" />
+
+    <rect x="64" y="34" width="3.5" height="18" rx="1.75" fill="url(#appGrad)" />
+    <circle cx="65.75" cy="34" r="2" fill="#52DDBB" />
+
+    <line x1="28" y1="88" x2="72" y2="88" stroke="#64C8FF" stroke-width="2" stroke-linecap="round" opacity="0.8" />
+    <circle cx="34" cy="88" r="2" fill="#52DDBB" />
+    <circle cx="50" cy="88" r="2.5" fill="#64C8FF" />
+    <circle cx="66" cy="88" r="2" fill="#52DDBB" />
+  </g>
+</svg>

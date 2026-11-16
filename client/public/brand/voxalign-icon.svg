@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%" fill="none">
+  <defs>
+    <linearGradient id="voxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#52DDBB" />
+      <stop offset="100%" stop-color="#64C8FF" />
+    </linearGradient>
+    <linearGradient id="waveGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#52DDBB" stop-opacity="0.7" />
+      <stop offset="100%" stop-color="#64C8FF" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Left arm of the geometric V -->
+  <path d="M14 18 L32 18 L50 68 L41 68 Z" fill="url(#voxGrad)" />
+
+  <!-- Right arm of the geometric V -->
+  <path d="M86 18 L68 18 L50 68 L59 68 Z" fill="url(#voxGrad)" />
+
+  <!-- Central alignment apex timestamp pin -->
+  <circle cx="50" cy="78" r="4.5" fill="#52DDBB" filter="url(#glow)" />
+  <line x1="50" y1="68" x2="50" y2="78" stroke="#52DDBB" stroke-width="2.5" stroke-dasharray="1 1" />
+
+  <!-- Waveform bars inside the V cavity -->
+  <!-- Bar 1 (left) -->
+  <rect x="36" y="34" width="3.5" height="18" rx="1.75" fill="url(#waveGrad)" />
+  <circle cx="37.75" cy="34" r="2" fill="#52DDBB" />
+
+  <!-- Bar 2 (center left) -->
+  <rect x="43" y="24" width="3.5" height="34" rx="1.75" fill="url(#waveGrad)" />
+  <circle cx="44.75" cy="24" r="2" fill="#64C8FF" />
+
+  <!-- Bar 3 (center - highest) -->
+  <rect x="50" y="16" width="3.5" height="46" rx="1.75" fill="url(#waveGrad)" />
+  <circle cx="51.75" cy="16" r="2.5" fill="#F5F8FC" filter="url(#glow)" />
+
+  <!-- Bar 4 (center right) -->
+  <rect x="57" y="24" width="3.5" height="34" rx="1.75" fill="url(#waveGrad)" />
+  <circle cx="58.75" cy="24" r="2" fill="#64C8FF" />
+
+  <!-- Bar 5 (right) -->
+  <rect x="64" y="34" width="3.5" height="18" rx="1.75" fill="url(#waveGrad)" />
+  <circle cx="65.75" cy="34" r="2" fill="#52DDBB" />
+
+  <!-- Baseline timeline alignment indicator -->
+  <line x1="28" y1="88" x2="72" y2="88" stroke="#64C8FF" stroke-width="2" stroke-linecap="round" opacity="0.8" />
+  <circle cx="34" cy="88" r="2" fill="#52DDBB" />
+  <circle cx="50" cy="88" r="2.5" fill="#64C8FF" />
+  <circle cx="66" cy="88" r="2" fill="#52DDBB" />
+</svg>

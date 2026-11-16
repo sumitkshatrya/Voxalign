@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --vox-bg-primary: #0B1422;
+  --vox-bg-secondary: #172538;
+  --vox-bg-tertiary: #1E2D44;
+  --vox-bg-elevated: #243550;
+  --vox-bg-card: rgba(23, 37, 56, 0.7);
+
+  --vox-accent-teal: #52DDBB;
+  --vox-accent-blue: #64C8FF;
+
+  --vox-text-primary: #F5F8FC;
+  --vox-text-secondary: #94A3B8;
+  --vox-text-muted: #64748B;
+  --vox-text-disabled: #475569;
+
+  --vox-border-subtle: rgba(148, 163, 184, 0.12);
+  --vox-border-active: rgba(82, 221, 187, 0.4);
+}
+
+[data-theme='light'] {
+  --vox-bg-primary: #F8FAFC;
+  --vox-bg-secondary: #FFFFFF;
+  --vox-bg-tertiary: #F1F5F9;
+  --vox-bg-elevated: #E2E8F0;
+  --vox-bg-card: rgba(255, 255, 255, 0.9);
+
+  --vox-accent-teal: #0D9488;
+  --vox-accent-blue: #0284C7;
+
+  --vox-text-primary: #0F172A;
+  --vox-text-secondary: #475569;
+  --vox-text-muted: #64748B;
+  --vox-text-disabled: #94A3B8;
+
+  --vox-border-subtle: rgba(15, 23, 42, 0.1);
+  --vox-border-active: rgba(13, 148, 136, 0.5);
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--vox-bg-primary);
+  color: var(--vox-text-primary);
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Custom sleek scrollbar for audio tracks and lists */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(11, 20, 34, 0.5);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.25);
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(82, 221, 187, 0.5);
+}

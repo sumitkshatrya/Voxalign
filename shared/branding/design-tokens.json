@@ -1,0 +1,32 @@
+{
+  "brand": {
+    "name": "VoxAlign",
+    "tagline": "Every Word. Every Second. Aligned.",
+    "category": "AI Audio Intelligence & Speech Annotation Platform"
+  },
+  "colors": {
+    "dark": {
+      "bgPrimary": "#0B1422",
+      "bgSecondary": "#172538",
+      "bgTertiary": "#1E2D44",
+      "accentTeal": "#52DDBB",
+      "accentBlue": "#64C8FF",
+      "textPrimary": "#F5F8FC",
+      "textSecondary": "#94A3B8"
+    },
+    "light": {
+      "bgPrimary": "#F8FAFC",
+      "bgSecondary": "#FFFFFF",
+      "bgTertiary": "#F1F5F9",
+      "accentTeal": "#0D9488",
+      "accentBlue": "#0284C7",
+      "textPrimary": "#0F172A",
+      "textSecondary": "#475569"
+    }
+  },
+  "typography": {
+    "headings": "Manrope",
+    "body": "Inter",
+    "timestamps": "JetBrains Mono"
+  }
+}
