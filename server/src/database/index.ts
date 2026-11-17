@@ -1,5 +1,13 @@
+import dns from 'dns';
 import mongoose from 'mongoose';
 import { config } from '../config';
+
+// Ensure SRV records for MongoDB Atlas resolve reliably across local ISP DNS
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
+} catch (e) {
+  // Ignore if custom DNS cannot be set
+}
 
 let isConnected = false;
 let isInMemoryFallback = false;

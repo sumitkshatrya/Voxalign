@@ -1,6 +1,19 @@
 {
   "users": [
     {
+      "id": "usr_admin_001",
+      "email": "admin@voxalign.ai",
+      "password": "$2a$10$2pEiQYbXeVOVgD.sCLy1J.nJ1JesJ4b3ItbMgJO4y8x2Lhfnr.0va",
+      "name": "Dr. Alistair Vance (Lead Architect)",
+      "role": "admin",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      "organization": "VoxAlign AI Labs",
+      "quotaMinutes": 1000,
+      "usedMinutes": 45,
+      "createdAt": "2026-11-17T04:06:13.858Z",
+      "updatedAt": "2026-11-17T04:06:13.872Z"
+    },
+    {
       "id": "usr_6ed3e37d",
       "email": "test_annotator@voxalign.ai",
       "password": "hashed_password_xyz",
@@ -8,9 +21,316 @@
       "role": "user",
       "createdAt": "2026-11-16T16:43:21.854Z",
       "updatedAt": "2026-11-16T16:43:21.864Z"
+    },
+    {
+      "id": "usr_annotator_001",
+      "email": "annotator@voxalign.ai",
+      "password": "$2a$10$2pEiQYbXeVOVgD.sCLy1J.Vj9xo.BopSqZh0K1O5CRqe3BFzROrxC",
+      "name": "Priya Sharma (Senior Speech Annotator)",
+      "role": "user",
+      "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150",
+      "organization": "Indic Speech Corpora",
+      "quotaMinutes": 300,
+      "usedMinutes": 28,
+      "createdAt": "2026-11-17T04:06:13.872Z",
+      "updatedAt": "2026-11-17T04:06:13.872Z"
     }
   ],
-  "projects": [],
-  "audioFiles": [],
-  "auditLogs": []
+  "projects": [
+    {
+      "id": "proj_hindi_corpus_01",
+      "userId": "usr_annotator_001",
+      "name": "Hindi Conversational Corpus — Delhi NCR",
+      "description": "Audio collection of spontaneous bilingual Hindi-English conversations for speech synthesis and forced alignment.",
+      "targetLanguage": "hi-en",
+      "guidelinesProfile": "hindi_hi_IN",
+      "audioFilesCount": 1,
+      "totalDurationSeconds": 18.45,
+      "status": "active",
+      "createdAt": "2026-11-16T04:06:13.872Z",
+      "updatedAt": "2026-11-17T04:06:13.872Z"
+    }
+  ],
+  "audioFiles": [
+    {
+      "id": "aud_hindi_sample_01",
+      "projectId": "proj_hindi_corpus_01",
+      "userId": "usr_annotator_001",
+      "filename": "delhi_dialogue_sample.wav",
+      "originalName": "delhi_dialogue_sample.wav",
+      "storagePath": "D:\\Voxalign\\server\\uploads\\delhi_dialogue_sample.wav",
+      "url": "/api/audio/aud_hindi_sample_01/stream",
+      "metadata": {
+        "duration": 18.45,
+        "sampleRate": 16000,
+        "channels": 1,
+        "format": "wav",
+        "fileSize": 590400
+      },
+      "status": "completed",
+      "processingProgress": 100,
+      "processingStep": "Alignment Complete",
+      "speakers": [
+        "Speaker 1",
+        "Speaker 2"
+      ],
+      "languageDetected": "hi-en",
+      "isSynthetic": false,
+      "isDistorted": false,
+      "hasPii": false,
+      "qualityScore": 98,
+      "segments": [
+        {
+          "id": "seg_001",
+          "text": "नमस्ते",
+          "start": 0.12,
+          "end": 0.65,
+          "speaker": "Speaker 1",
+          "confidence": 0.99,
+          "language": "hi",
+          "reviewStatus": "verified",
+          "validationIssues": []
+        },
+        {
+          "id": "seg_002",
+          "text": "मेरा",
+          "start": 0.72,
+          "end": 0.98,
+          "speaker": "Speaker 1",
+          "confidence": 0.98,
+          "language": "hi",
+          "reviewStatus": "verified",
+          "validationIssues": []
+        },
+        {
+          "id": "seg_003",
+          "text": "नाम",
+          "start": 1.02,
+          "end": 1.34,
+          "speaker": "Speaker 1",
+          "confidence": 0.99,
+          "language": "hi",
+          "reviewStatus": "verified",
+          "validationIssues": []
+        },
+        {
+          "id": "seg_004",
+          "text": "राहुल",
+          "start": 1.4,
+          "end": 1.82,
+          "speaker": "Speaker 1",
+          "confidence": 0.97,
+          "language": "hi",
+          "reviewStatus": "verified",
+          "validationIssues": []
+        },
+        {
+          "id": "seg_005",
+          "text": "है",
+          "start": 1.88,
+          "end": 2.1,
+          "speaker": "Speaker 1",
+          "confidence": 0.99,
+          "language": "hi",
+          "reviewStatus": "verified",
+          "validationIssues": []
+        },
+        {
+          "id": "seg_006",
+          "text": "अं",
+          "start": 2.45,
+          "end": 2.78,
+          "speaker": "Speaker 1",
+          "confidence": 0.94,
+          "language": "hi",
+          "isHesitation": true,
+          "reviewStatus": "verified",
+          "validationIssues": []
+        },
+        {
+          "id": "seg_007",
+          "text": "आज",
+          "start": 2.92,
+          "end": 3.25,
+          "speaker": "Speaker 1",
+          "confidence": 0.98,
+          "language": "hi",
+          "reviewStatus": "verified",
+          "validationIssues": []
+        },
+        {
+          "id": "seg_008",
+          "text": "मौसम",
+          "start": 3.3,
+          "end": 3.75,
+          "speaker": "Speaker 1",
+          "confidence": 0.98,
+          "language": "hi",
+          "reviewStatus": "verified",
+          "validationIssues": []
+        },
+        {
+          "id": "seg_009",
+          "text": "बहुत",
+          "start": 3.82,
+          "end": 4.15,
+          "speaker": "Speaker 1",
+          "confidence": 0.99,
+          "language": "hi",
+          "reviewStatus": "verified",
+          "validationIssues": []
+        },
+        {
+          "id": "seg_010",
+          "text": "cold",
+          "start": 4.22,
+          "end": 4.68,
+          "speaker": "Speaker 1",
+          "confidence": 0.96,
+          "language": "en",
+          "reviewStatus": "verified",
+          "validationIssues": []
+        },
+        {
+          "id": "seg_011",
+          "text": "है",
+          "start": 4.74,
+          "end": 4.95,
+          "speaker": "Speaker 1",
+          "confidence": 0.99,
+          "language": "hi",
+          "reviewStatus": "verified",
+          "validationIssues": []
+        },
+        {
+          "id": "seg_012",
+          "text": "हाँ",
+          "start": 5.3,
+          "end": 5.62,
+          "speaker": "Speaker 2",
+          "confidence": 0.99,
+          "language": "hi",
+          "reviewStatus": "verified",
+          "validationIssues": []
+        },
+        {
+          "id": "seg_013",
+          "text": "जी",
+          "start": 5.68,
+          "end": 5.95,
+          "speaker": "Speaker 2",
+          "confidence": 0.98,
+          "language": "hi",
+          "reviewStatus": "verified",
+          "validationIssues": []
+        },
+        {
+          "id": "seg_014",
+          "text": "हम्म",
+          "start": 6.2,
+          "end": 6.75,
+          "speaker": "Speaker 2",
+          "confidence": 0.95,
+          "language": "hi",
+          "reviewStatus": "verified",
+          "validationIssues": []
+        },
+        {
+          "id": "seg_015",
+          "text": "कल",
+          "start": 7.1,
+          "end": 7.42,
+          "speaker": "Speaker 2",
+          "confidence": 0.97,
+          "language": "hi",
+          "reviewStatus": "verified",
+          "validationIssues": []
+        },
+        {
+          "id": "seg_016",
+          "text": "भी",
+          "start": 7.48,
+          "end": 7.7,
+          "speaker": "Speaker 2",
+          "confidence": 0.98,
+          "language": "hi",
+          "reviewStatus": "verified",
+          "validationIssues": []
+        },
+        {
+          "id": "seg_017",
+          "text": "पंद्रह",
+          "start": 7.78,
+          "end": 8.24,
+          "speaker": "Speaker 2",
+          "confidence": 0.96,
+          "language": "hi",
+          "reviewStatus": "verified",
+          "validationIssues": []
+        },
+        {
+          "id": "seg_018",
+          "text": "डिग्री",
+          "start": 8.3,
+          "end": 8.78,
+          "speaker": "Speaker 2",
+          "confidence": 0.97,
+          "language": "hi",
+          "reviewStatus": "verified",
+          "validationIssues": []
+        },
+        {
+          "id": "seg_019",
+          "text": "तापमान",
+          "start": 8.84,
+          "end": 9.38,
+          "speaker": "Speaker 2",
+          "confidence": 0.98,
+          "language": "hi",
+          "reviewStatus": "verified",
+          "validationIssues": []
+        },
+        {
+          "id": "seg_020",
+          "text": "था",
+          "start": 9.42,
+          "end": 9.7,
+          "speaker": "Speaker 2",
+          "confidence": 0.99,
+          "language": "hi",
+          "reviewStatus": "verified",
+          "validationIssues": []
+        }
+      ],
+      "createdAt": "2026-11-16T16:06:13.873Z",
+      "updatedAt": "2026-11-17T04:06:13.873Z"
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": "609d3bce-5b72-47d0-bb30-c11616b203c4",
+      "userId": "usr_annotator_001",
+      "userEmail": "annotator@voxalign.ai",
+      "action": "PROJECT_CREATED",
+      "entityType": "project",
+      "entityId": "proj_hindi_corpus_01",
+      "details": {
+        "name": "Hindi Conversational Corpus — Delhi NCR"
+      },
+      "createdAt": "2026-11-16T04:06:13.873Z"
+    },
+    {
+      "id": "146ede49-5cd4-4af8-9082-564fbf49caea",
+      "userId": "usr_annotator_001",
+      "userEmail": "annotator@voxalign.ai",
+      "action": "AUDIO_ALIGNED",
+      "entityType": "audio",
+      "entityId": "aud_hindi_sample_01",
+      "details": {
+        "segmentCount": 20,
+        "qualityScore": 98
+      },
+      "createdAt": "2026-11-16T16:06:13.873Z"
+    }
+  ]
 }

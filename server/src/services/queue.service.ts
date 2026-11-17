@@ -18,10 +18,16 @@ let isProcessingMemoryQueue = false;
 
 export async function initQueue() {
   try {
-    const redisConnection = new IORedis(config.redisUrl, {
+    let resolvedRedisUrl = config.redisUrl;
+    // Automatically enable TLS for Upstash or remote SSL endpoints if user passed redis:// instead of rediss://
+    if (resolvedRedisUrl.includes('upstash.io') && resolvedRedisUrl.startsWith('redis://')) {
+      resolvedRedisUrl = resolvedRedisUrl.replace('redis://', 'rediss://');
+    }
+
+    const redisConnection = new IORedis(resolvedRedisUrl, {
       maxRetriesPerRequest: null,
-      connectTimeout: 1000,
-      retryStrategy: () => null, // don't endlessly retry if not running
+      connectTimeout: 8000,
+      retryStrategy: (times) => (times <= 3 ? Math.min(times * 1000, 3000) : null),
       lazyConnect: true
     });
 
@@ -38,11 +44,14 @@ export async function initQueue() {
       connection: redisConnection
     });
 
+    const workerConnection = redisConnection.duplicate();
+    await workerConnection.connect();
+
     const worker = new Worker('audio-alignment-queue', async (job) => {
       console.log(`[Worker] Processing job ${job.id} for file ${job.data.fileId}`);
       await processAudioFile(job.data.fileId);
     }, {
-      connection: redisConnection
+      connection: workerConnection
     });
 
     worker.on('failed', (job, err) => {
@@ -50,7 +59,7 @@ export async function initQueue() {
     });
 
   } catch (err: any) {
-    console.warn(`[Queue] Redis connection not active. Using asynchronous background queue fallback.`);
+    console.warn(`[Queue] Redis connection not active (${err.message}). Using asynchronous background queue fallback.`);
     isRedisAvailable = false;
   }
 }
