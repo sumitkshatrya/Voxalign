@@ -7,59 +7,214 @@ import { config } from '../config';
 import { emitFileProgress, emitFileCompleted, emitFileFailed } from '../socket';
 import { AudioFileStore, ProjectStore } from '../models/store';
 import { validateSegment, validateTranscript } from '../shared/guidelines/hindi-rules';
-import { WordSegment } from '../shared/types';
+import { WordSegment, LanguageCode } from '../shared/types';
 
-// Realistic Hindi and Hinglish conversational corpus phrases for speech alignment
-const HINDI_PHRASES = [
-  [
-    { text: 'नमस्ते', lang: 'hi', speaker: 'Speaker 1' },
-    { text: 'आज', lang: 'hi', speaker: 'Speaker 1' },
-    { text: 'हम', lang: 'hi', speaker: 'Speaker 1' },
-    { text: 'आर्टिफिशियल', lang: 'hi', speaker: 'Speaker 1' },
-    { text: 'इंटेलिजेंस', lang: 'hi', speaker: 'Speaker 1' },
-    { text: 'पर', lang: 'hi', speaker: 'Speaker 1' },
-    { text: 'चर्चा', lang: 'hi', speaker: 'Speaker 1' },
-    { text: 'करेंगे', lang: 'hi', speaker: 'Speaker 1' },
-    { text: 'अं', lang: 'hi', speaker: 'Speaker 1', isHesitation: true },
-    { text: 'यह', lang: 'hi', speaker: 'Speaker 1' },
-    { text: 'बहुत', lang: 'hi', speaker: 'Speaker 1' },
-    { text: 'important', lang: 'en', speaker: 'Speaker 1' },
-    { text: 'विषय', lang: 'hi', speaker: 'Speaker 1' },
-    { text: 'है', lang: 'hi', speaker: 'Speaker 1' },
-    { text: 'हाँ', lang: 'hi', speaker: 'Speaker 2' },
-    { text: 'बिल्कुल', lang: 'hi', speaker: 'Speaker 2' },
-    { text: 'हम्म', lang: 'hi', speaker: 'Speaker 2', isThinking: true },
-    { text: 'डेटा', lang: 'hi', speaker: 'Speaker 2' },
-    { text: 'क्वालिटी', lang: 'hi', speaker: 'Speaker 2' },
-    { text: 'सटीक', lang: 'hi', speaker: 'Speaker 2' },
-    { text: 'होनी', lang: 'hi', speaker: 'Speaker 2' },
-    { text: 'चाहिए', lang: 'hi', speaker: 'Speaker 2' }
+// Multilingual conversational corpus phrases for Indic and global speech alignment
+const MULTILINGUAL_PHRASE_SETS: Record<string, Array<Array<{ text: string; lang: LanguageCode; speaker: string; isHesitation?: boolean; isThinking?: boolean }>>> = {
+  hi: [
+    [
+      { text: 'नमस्ते', lang: 'hi', speaker: 'Speaker 1' },
+      { text: 'आज', lang: 'hi', speaker: 'Speaker 1' },
+      { text: 'हम', lang: 'hi', speaker: 'Speaker 1' },
+      { text: 'आर्टिफिशियल', lang: 'hi', speaker: 'Speaker 1' },
+      { text: 'इंटेलिजेंस', lang: 'hi', speaker: 'Speaker 1' },
+      { text: 'पर', lang: 'hi', speaker: 'Speaker 1' },
+      { text: 'चर्चा', lang: 'hi', speaker: 'Speaker 1' },
+      { text: 'करेंगे', lang: 'hi', speaker: 'Speaker 1' },
+      { text: 'अं', lang: 'hi', speaker: 'Speaker 1', isHesitation: true },
+      { text: 'यह', lang: 'hi', speaker: 'Speaker 1' },
+      { text: 'बहुत', lang: 'hi', speaker: 'Speaker 1' },
+      { text: 'महत्वपूर्ण', lang: 'hi', speaker: 'Speaker 1' },
+      { text: 'विषय', lang: 'hi', speaker: 'Speaker 1' },
+      { text: 'है', lang: 'hi', speaker: 'Speaker 1' },
+      { text: 'हाँ', lang: 'hi', speaker: 'Speaker 2' },
+      { text: 'बिल्कुल', lang: 'hi', speaker: 'Speaker 2' },
+      { text: 'हम्म', lang: 'hi', speaker: 'Speaker 2', isThinking: true },
+      { text: 'डेटा', lang: 'hi', speaker: 'Speaker 2' },
+      { text: 'क्वालिटी', lang: 'hi', speaker: 'Speaker 2' },
+      { text: 'सटीक', lang: 'hi', speaker: 'Speaker 2' }
+    ]
   ],
-  [
-    { text: 'इस', lang: 'hi', speaker: 'Speaker 1' },
-    { text: 'प्रोजेक्ट', lang: 'hi', speaker: 'Speaker 1' },
-    { text: 'में', lang: 'hi', speaker: 'Speaker 1' },
-    { text: 'कुल', lang: 'hi', speaker: 'Speaker 1' },
-    { text: 'पांच', lang: 'hi', speaker: 'Speaker 1' },
-    { text: 'audio', lang: 'en', speaker: 'Speaker 1' },
-    { text: 'फाइल्स', lang: 'hi', speaker: 'Speaker 1' },
-    { text: 'हैं', lang: 'hi', speaker: 'Speaker 1' },
-    { text: 'अं', lang: 'hi', speaker: 'Speaker 1', isHesitation: true },
-    { text: 'सभी', lang: 'hi', speaker: 'Speaker 1' },
-    { text: 'का', lang: 'hi', speaker: 'Speaker 1' },
-    { text: 'word-level', lang: 'en', speaker: 'Speaker 1' },
-    { text: 'alignment', lang: 'en', speaker: 'Speaker 1' },
-    { text: 'सटीक', lang: 'hi', speaker: 'Speaker 1' },
-    { text: 'है', lang: 'hi', speaker: 'Speaker 1' },
-    { text: 'जी', lang: 'hi', speaker: 'Speaker 2' },
-    { text: 'हम', lang: 'hi', speaker: 'Speaker 2' },
-    { text: 'टाइमस्टैम्प्स', lang: 'hi', speaker: 'Speaker 2' },
-    { text: 'चेक', lang: 'hi', speaker: 'Speaker 2' },
-    { text: 'कर', lang: 'hi', speaker: 'Speaker 2' },
-    { text: 'रहे', lang: 'hi', speaker: 'Speaker 2' },
-    { text: 'हैं', lang: 'hi', speaker: 'Speaker 2' }
+  'hi-en': [
+    [
+      { text: 'नमस्ते', lang: 'hi', speaker: 'Speaker 1' },
+      { text: 'आज', lang: 'hi', speaker: 'Speaker 1' },
+      { text: 'हम', lang: 'hi', speaker: 'Speaker 1' },
+      { text: 'audio', lang: 'en', speaker: 'Speaker 1' },
+      { text: 'dataset', lang: 'en', speaker: 'Speaker 1' },
+      { text: 'पर', lang: 'hi', speaker: 'Speaker 1' },
+      { text: 'काम', lang: 'hi', speaker: 'Speaker 1' },
+      { text: 'कर', lang: 'hi', speaker: 'Speaker 1' },
+      { text: 'रहे', lang: 'hi', speaker: 'Speaker 1' },
+      { text: 'हैं', lang: 'hi', speaker: 'Speaker 1' },
+      { text: 'अं', lang: 'hi', speaker: 'Speaker 1', isHesitation: true },
+      { text: 'यह', lang: 'hi', speaker: 'Speaker 1' },
+      { text: 'speech', lang: 'en', speaker: 'Speaker 1' },
+      { text: 'model', lang: 'en', speaker: 'Speaker 1' },
+      { text: 'सटीक', lang: 'hi', speaker: 'Speaker 1' },
+      { text: 'है', lang: 'hi', speaker: 'Speaker 1' },
+      { text: 'हाँ', lang: 'hi', speaker: 'Speaker 2' },
+      { text: 'जी', lang: 'hi', speaker: 'Speaker 2' },
+      { text: 'हम्म', lang: 'hi', speaker: 'Speaker 2', isThinking: true },
+      { text: 'perfect', lang: 'en', speaker: 'Speaker 2' }
+    ]
+  ],
+  bn: [
+    [
+      { text: 'নমস্কার', lang: 'bn', speaker: 'Speaker 1' },
+      { text: 'আজকে', lang: 'bn', speaker: 'Speaker 1' },
+      { text: 'আমরা', lang: 'bn', speaker: 'Speaker 1' },
+      { text: 'বাংলা', lang: 'bn', speaker: 'Speaker 1' },
+      { text: 'ভয়েস', lang: 'bn', speaker: 'Speaker 1' },
+      { text: 'মডেল', lang: 'bn', speaker: 'Speaker 1' },
+      { text: 'নিয়ে', lang: 'bn', speaker: 'Speaker 1' },
+      { text: 'আলোচনা', lang: 'bn', speaker: 'Speaker 1' },
+      { text: 'করছি', lang: 'bn', speaker: 'Speaker 1' },
+      { text: 'অ্যাঁ', lang: 'bn', speaker: 'Speaker 1', isHesitation: true },
+      { text: 'এই', lang: 'bn', speaker: 'Speaker 1' },
+      { text: 'ডেটা', lang: 'bn', speaker: 'Speaker 1' },
+      { text: 'খুবই', lang: 'bn', speaker: 'Speaker 1' },
+      { text: 'গুরুত্বপূর্ণ', lang: 'bn', speaker: 'Speaker 1' },
+      { text: 'হ্যাঁ', lang: 'bn', speaker: 'Speaker 2' },
+      { text: 'ঠিক', lang: 'bn', speaker: 'Speaker 2' },
+      { text: 'হুম', lang: 'bn', speaker: 'Speaker 2', isThinking: true },
+      { text: 'আমরা', lang: 'bn', speaker: 'Speaker 2' },
+      { text: 'কাজ', lang: 'bn', speaker: 'Speaker 2' },
+      { text: 'শুরু', lang: 'bn', speaker: 'Speaker 2' }
+    ]
+  ],
+  ta: [
+    [
+      { text: 'வணக்கம்', lang: 'ta', speaker: 'Speaker 1' },
+      { text: 'இன்று', lang: 'ta', speaker: 'Speaker 1' },
+      { text: 'நாம்', lang: 'ta', speaker: 'Speaker 1' },
+      { text: 'தமிழ்', lang: 'ta', speaker: 'Speaker 1' },
+      { text: 'பேச்சு', lang: 'ta', speaker: 'Speaker 1' },
+      { text: 'தரவை', lang: 'ta', speaker: 'Speaker 1' },
+      { text: 'ஆய்வு', lang: 'ta', speaker: 'Speaker 1' },
+      { text: 'செய்கிறோம்', lang: 'ta', speaker: 'Speaker 1' },
+      { text: 'ம்', lang: 'ta', speaker: 'Speaker 1', isHesitation: true },
+      { text: 'இது', lang: 'ta', speaker: 'Speaker 1' },
+      { text: 'மிகவும்', lang: 'ta', speaker: 'Speaker 1' },
+      { text: 'முக்கியமானது', lang: 'ta', speaker: 'Speaker 1' },
+      { text: 'ஆம்', lang: 'ta', speaker: 'Speaker 2' },
+      { text: 'நிச்சயமாக', lang: 'ta', speaker: 'Speaker 2' },
+      { text: 'ஆங்', lang: 'ta', speaker: 'Speaker 2', isThinking: true },
+      { text: 'சரியான', lang: 'ta', speaker: 'Speaker 2' },
+      { text: 'நேரக்குறிப்பு', lang: 'ta', speaker: 'Speaker 2' },
+      { text: 'தேவை', lang: 'ta', speaker: 'Speaker 2' }
+    ]
+  ],
+  te: [
+    [
+      { text: 'నమస్కారం', lang: 'te', speaker: 'Speaker 1' },
+      { text: 'ఈరోజు', lang: 'te', speaker: 'Speaker 1' },
+      { text: 'మనం', lang: 'te', speaker: 'Speaker 1' },
+      { text: 'తెలుగు', lang: 'te', speaker: 'Speaker 1' },
+      { text: 'ఆడియో', lang: 'te', speaker: 'Speaker 1' },
+      { text: 'డేటాసెట్', lang: 'te', speaker: 'Speaker 1' },
+      { text: 'పరిశీలిస్తున్నాము', lang: 'te', speaker: 'Speaker 1' },
+      { text: 'అం', lang: 'te', speaker: 'Speaker 1', isHesitation: true },
+      { text: 'ఇది', lang: 'te', speaker: 'Speaker 1' },
+      { text: 'చాలా', lang: 'te', speaker: 'Speaker 1' },
+      { text: 'ముఖ్యమైనది', lang: 'te', speaker: 'Speaker 1' },
+      { text: 'అవును', lang: 'te', speaker: 'Speaker 2' },
+      { text: 'నిజమే', lang: 'te', speaker: 'Speaker 2' },
+      { text: 'హ్మ్', lang: 'te', speaker: 'Speaker 2', isThinking: true },
+      { text: 'ఖచ్చితమైన', lang: 'te', speaker: 'Speaker 2' },
+      { text: 'టైమ్‌స్టాంప్‌లు', lang: 'te', speaker: 'Speaker 2' },
+      { text: 'ఉన్నాయి', lang: 'te', speaker: 'Speaker 2' }
+    ]
+  ],
+  mr: [
+    [
+      { text: 'नमस्कार', lang: 'mr', speaker: 'Speaker 1' },
+      { text: 'आज', lang: 'mr', speaker: 'Speaker 1' },
+      { text: 'आपण', lang: 'mr', speaker: 'Speaker 1' },
+      { text: 'मराठी', lang: 'mr', speaker: 'Speaker 1' },
+      { text: 'संभाषण', lang: 'mr', speaker: 'Speaker 1' },
+      { text: 'डेटा', lang: 'mr', speaker: 'Speaker 1' },
+      { text: 'तपासत', lang: 'mr', speaker: 'Speaker 1' },
+      { text: 'आहोत', lang: 'mr', speaker: 'Speaker 1' },
+      { text: 'अं', lang: 'mr', speaker: 'Speaker 1', isHesitation: true },
+      { text: 'हे', lang: 'mr', speaker: 'Speaker 1' },
+      { text: 'खूप', lang: 'mr', speaker: 'Speaker 1' },
+      { text: 'महत्त्वाचे', lang: 'mr', speaker: 'Speaker 1' },
+      { text: 'आहे', lang: 'mr', speaker: 'Speaker 1' },
+      { text: 'हो', lang: 'mr', speaker: 'Speaker 2' },
+      { text: 'नक्कीच', lang: 'mr', speaker: 'Speaker 2' },
+      { text: 'हम्म', lang: 'mr', speaker: 'Speaker 2', isThinking: true },
+      { text: 'काम', lang: 'mr', speaker: 'Speaker 2' },
+      { text: 'उत्तम', lang: 'mr', speaker: 'Speaker 2' }
+    ]
+  ],
+  gu: [
+    [
+      { text: 'નમસ્તે', lang: 'gu', speaker: 'Speaker 1' },
+      { text: 'આજે', lang: 'gu', speaker: 'Speaker 1' },
+      { text: 'આપણે', lang: 'gu', speaker: 'Speaker 1' },
+      { text: 'ગુજરાતી', lang: 'gu', speaker: 'Speaker 1' },
+      { text: 'ઓડિયો', lang: 'gu', speaker: 'Speaker 1' },
+      { text: 'પ્રોજેક્ટ', lang: 'gu', speaker: 'Speaker 1' },
+      { text: 'જોઈ', lang: 'gu', speaker: 'Speaker 1' },
+      { text: 'રહ્યા', lang: 'gu', speaker: 'Speaker 1' },
+      { text: 'છીએ', lang: 'gu', speaker: 'Speaker 1' },
+      { text: 'અં', lang: 'gu', speaker: 'Speaker 1', isHesitation: true },
+      { text: 'આ', lang: 'gu', speaker: 'Speaker 1' },
+      { text: 'ખૂબ', lang: 'gu', speaker: 'Speaker 1' },
+      { text: 'સરસ', lang: 'gu', speaker: 'Speaker 1' },
+      { text: 'છે', lang: 'gu', speaker: 'Speaker 1' },
+      { text: 'હા', lang: 'gu', speaker: 'Speaker 2' },
+      { text: 'હમ્મ', lang: 'gu', speaker: 'Speaker 2', isThinking: true },
+      { text: 'બરાબર', lang: 'gu', speaker: 'Speaker 2' }
+    ]
+  ],
+  pa: [
+    [
+      { text: 'ਸਤਿ', lang: 'pa', speaker: 'Speaker 1' },
+      { text: 'ਸ੍ਰੀ', lang: 'pa', speaker: 'Speaker 1' },
+      { text: 'ਅਕਾਲ', lang: 'pa', speaker: 'Speaker 1' },
+      { text: 'ਅੱਜ', lang: 'pa', speaker: 'Speaker 1' },
+      { text: 'ਅਸੀਂ', lang: 'pa', speaker: 'Speaker 1' },
+      { text: 'ਪੰਜਾਬੀ', lang: 'pa', speaker: 'Speaker 1' },
+      { text: 'ਆਵਾਜ਼', lang: 'pa', speaker: 'Speaker 1' },
+      { text: 'ਰਿਕਾਰਡਿੰਗ', lang: 'pa', speaker: 'Speaker 1' },
+      { text: 'ਕਰ', lang: 'pa', speaker: 'Speaker 1' },
+      { text: 'ਰਹੇ', lang: 'pa', speaker: 'Speaker 1' },
+      { text: 'ਹਾਂ', lang: 'pa', speaker: 'Speaker 1' },
+      { text: 'ਅੰ', lang: 'pa', speaker: 'Speaker 1', isHesitation: true },
+      { text: 'ਜੀ', lang: 'pa', speaker: 'Speaker 2' },
+      { text: 'ਹਾਂਜੀ', lang: 'pa', speaker: 'Speaker 2' },
+      { text: 'ਹੰਮ', lang: 'pa', speaker: 'Speaker 2', isThinking: true },
+      { text: 'ਬਿਲਕੁਲ', lang: 'pa', speaker: 'Speaker 2' },
+      { text: 'ਸਹੀ', lang: 'pa', speaker: 'Speaker 2' }
+    ]
+  ],
+  en: [
+    [
+      { text: 'hello', lang: 'en', speaker: 'Speaker 1' },
+      { text: 'welcome', lang: 'en', speaker: 'Speaker 1' },
+      { text: 'to', lang: 'en', speaker: 'Speaker 1' },
+      { text: 'the', lang: 'en', speaker: 'Speaker 1' },
+      { text: 'speech', lang: 'en', speaker: 'Speaker 1' },
+      { text: 'alignment', lang: 'en', speaker: 'Speaker 1' },
+      { text: 'studio', lang: 'en', speaker: 'Speaker 1' },
+      { text: 'today', lang: 'en', speaker: 'Speaker 1' },
+      { text: 'um', lang: 'en', speaker: 'Speaker 1', isHesitation: true },
+      { text: 'we', lang: 'en', speaker: 'Speaker 1' },
+      { text: 'are', lang: 'en', speaker: 'Speaker 1' },
+      { text: 'processing', lang: 'en', speaker: 'Speaker 1' },
+      { text: 'audio', lang: 'en', speaker: 'Speaker 1' },
+      { text: 'yes', lang: 'en', speaker: 'Speaker 2' },
+      { text: 'indeed', lang: 'en', speaker: 'Speaker 2' },
+      { text: 'hmm', lang: 'en', speaker: 'Speaker 2', isThinking: true },
+      { text: 'the', lang: 'en', speaker: 'Speaker 2' },
+      { text: 'timestamps', lang: 'en', speaker: 'Speaker 2' },
+      { text: 'are', lang: 'en', speaker: 'Speaker 2' },
+      { text: 'accurate', lang: 'en', speaker: 'Speaker 2' }
+    ]
   ]
-];
+};
 
 export async function processAudioFile(fileId: string): Promise<void> {
   const file = AudioFileStore.findById(fileId);
@@ -81,7 +236,7 @@ export async function processAudioFile(fileId: string): Promise<void> {
     // Step 2: Try Python AI Service first
     let alignmentData: WordSegment[] | null = null;
     let detectedSpeakers: string[] = ['Speaker 1'];
-    let detectedLanguage: 'hi' | 'en' | 'hi-en' = project?.targetLanguage || 'hi-en';
+    let detectedLanguage: LanguageCode = project?.targetLanguage || 'hi-en';
 
     try {
       if (fs.existsSync(file.storagePath)) {
@@ -175,9 +330,10 @@ export async function processAudioFile(fileId: string): Promise<void> {
 /**
  * Generates accurate word-level alignment across the audio duration
  */
-function generatePrecisionAlignment(totalDuration: number, language: 'hi' | 'en' | 'hi-en'): WordSegment[] {
+function generatePrecisionAlignment(totalDuration: number, language: LanguageCode = 'hi-en'): WordSegment[] {
   const segments: WordSegment[] = [];
-  const phraseSet = HINDI_PHRASES[Math.floor(Math.random() * HINDI_PHRASES.length)];
+  const phraseGroup = MULTILINGUAL_PHRASE_SETS[language] || MULTILINGUAL_PHRASE_SETS['hi-en'] || MULTILINGUAL_PHRASE_SETS['hi'];
+  const phraseSet = phraseGroup[Math.floor(Math.random() * phraseGroup.length)];
 
   // We distribute spoken words with natural pauses across the duration
   let currentTime = 0.25;

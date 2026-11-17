@@ -1,10 +1,11 @@
 import React from 'react';
 import { 
   Sliders, Clock, Mic, CheckCircle2, AlertCircle, 
-  HelpCircle, Sparkles, Tag, ShieldAlert 
+  HelpCircle, Sparkles, Tag, ShieldAlert, Globe 
 } from 'lucide-react';
 import { useWorkspaceStore } from '../../store/workspaceStore';
 import { CANONICAL_HINDI_HESITATION, CANONICAL_HINDI_THINKING } from '../../utils/hindiValidator';
+import { SUPPORTED_LANGUAGES, LanguageCode } from '../../types';
 
 export const SegmentInspector: React.FC = () => {
   const {
@@ -14,6 +15,7 @@ export const SegmentInspector: React.FC = () => {
     updateSegmentText,
     updateSegmentTimestamps,
     updateSegmentSpeaker,
+    updateSegmentLanguage,
     toggleSegmentStatus
   } = useWorkspaceStore();
 
@@ -30,9 +32,24 @@ export const SegmentInspector: React.FC = () => {
   }
 
   const duration = segment.end - segment.start;
-  const isDevanagari = /^[\u0900-\u097F]+$/.test(segment.text);
-  const isLatin = /^[a-z]+$/.test(segment.text);
   const confidence = segment.confidence || 0.95;
+
+  const getScriptLabel = (text: string) => {
+    const clean = text.replace(/[()]/g, '').trim();
+    if (!clean) return 'Special Tag';
+    if (/^[\u0900-\u097F]+$/.test(clean)) return 'Devanagari (hi/mr)';
+    if (/^[\u0980-\u09FF]+$/.test(clean)) return 'Bengali / Assamese (bn/as)';
+    if (/^[\u0B80-\u0BFF]+$/.test(clean)) return 'Tamil (ta)';
+    if (/^[\u0C00-\u0C7F]+$/.test(clean)) return 'Telugu (te)';
+    if (/^[\u0A80-\u0AFF]+$/.test(clean)) return 'Gujarati (gu)';
+    if (/^[\u0A00-\u0A7F]+$/.test(clean)) return 'Gurmukhi (pa)';
+    if (/^[\u0C80-\u0CFF]+$/.test(clean)) return 'Kannada (kn)';
+    if (/^[\u0D00-\u0D7F]+$/.test(clean)) return 'Malayalam (ml)';
+    if (/^[\u0B00-\u0B7F]+$/.test(clean)) return 'Odia (or)';
+    if (/^[\u0600-\u06FF]+$/.test(clean)) return 'Urdu / Arabic (ur/ar)';
+    if (/^[a-zA-Z]+$/.test(clean)) return 'Latin (en)';
+    return 'Special Marker / Mixed';
+  };
 
   return (
     <div className="p-4 space-y-5 text-xs text-[#F5F8FC] overflow-y-auto h-full custom-scrollbar">
@@ -66,16 +83,23 @@ export const SegmentInspector: React.FC = () => {
           <button
             onClick={() => updateSegmentText(segment.id, CANONICAL_HINDI_HESITATION)}
             className="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] text-[#52DDBB] font-mono"
-            title="Hindi Hesitation Filler (Page 13 Guidelines)"
+            title="Hindi/Devanagari Hesitation (अं)"
           >
             {CANONICAL_HINDI_HESITATION}
           </button>
           <button
             onClick={() => updateSegmentText(segment.id, CANONICAL_HINDI_THINKING)}
             className="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] text-[#64C8FF] font-mono"
-            title="Hindi Thinking Signal (Page 13 Guidelines)"
+            title="Hindi Thinking Signal (हम्म)"
           >
             {CANONICAL_HINDI_THINKING}
+          </button>
+          <button
+            onClick={() => updateSegmentText(segment.id, 'um')}
+            className="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] text-teal-300 font-mono"
+            title="English Hesitation (um)"
+          >
+            um
           </button>
           <button
             onClick={() => updateSegmentText(segment.id, '(())')}
@@ -91,6 +115,44 @@ export const SegmentInspector: React.FC = () => {
           >
             ((guess))
           </button>
+        </div>
+      </div>
+
+      {/* LANGUAGE & SPEAKER ASSIGNMENT */}
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="block text-[11px] font-semibold text-slate-400 mb-1.5 flex items-center gap-1.5">
+            <Globe className="w-3.5 h-3.5 text-[#52DDBB]" />
+            Language
+          </label>
+          <select
+            value={segment.language || 'hi'}
+            onChange={(e) => updateSegmentLanguage(segment.id, e.target.value as LanguageCode)}
+            className="w-full bg-[#172538] border border-white/10 rounded-lg px-2.5 py-2 text-xs text-white focus:outline-none focus:border-[#52DDBB]"
+          >
+            {SUPPORTED_LANGUAGES.map(lang => (
+              <option key={lang.code} value={lang.code}>
+                {lang.name} ({lang.code})
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-[11px] font-semibold text-slate-400 mb-1.5 flex items-center gap-1.5">
+            <Mic className="w-3.5 h-3.5 text-[#64C8FF]" />
+            Speaker
+          </label>
+          <select
+            value={segment.speaker}
+            onChange={(e) => updateSegmentSpeaker(segment.id, e.target.value)}
+            className="w-full bg-[#172538] border border-white/10 rounded-lg px-2.5 py-2 text-xs text-white focus:outline-none focus:border-[#64C8FF]"
+          >
+            {speakers.map(spk => (
+              <option key={spk} value={spk}>{spk}</option>
+            ))}
+            <option value={`Speaker ${speakers.length + 1}`}>+ Add New</option>
+          </select>
         </div>
       </div>
 
@@ -128,24 +190,6 @@ export const SegmentInspector: React.FC = () => {
         </div>
       </div>
 
-      {/* SPEAKER ASSIGNMENT */}
-      <div>
-        <label className="block text-[11px] font-semibold text-slate-400 mb-1.5 flex items-center gap-1.5">
-          <Mic className="w-3.5 h-3.5 text-[#64C8FF]" />
-          Assigned Speaker
-        </label>
-        <select
-          value={segment.speaker}
-          onChange={(e) => updateSegmentSpeaker(segment.id, e.target.value)}
-          className="w-full bg-[#172538] border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#64C8FF]"
-        >
-          {speakers.map(spk => (
-            <option key={spk} value={spk}>{spk}</option>
-          ))}
-          <option value={`Speaker ${speakers.length + 1}`}>+ Add New Speaker Label</option>
-        </select>
-      </div>
-
       {/* ACOUSTIC CONFIDENCE METER */}
       <div className="bg-[#172538]/50 p-3 rounded-xl border border-white/5 space-y-1.5">
         <div className="flex items-center justify-between text-[11px]">
@@ -162,18 +206,18 @@ export const SegmentInspector: React.FC = () => {
         </div>
       </div>
 
-      {/* HINDI GUIDELINES COMPLIANCE BREAKDOWN */}
+      {/* MULTILINGUAL GUIDELINES COMPLIANCE BREAKDOWN */}
       <div className="bg-[#0F1C2E] p-3 rounded-xl border border-white/5 space-y-2">
         <div className="flex items-center gap-1.5 text-xs font-semibold text-[#52DDBB]">
           <ShieldAlert className="w-3.5 h-3.5" />
-          <span>Guideline Analysis</span>
+          <span>Multilingual Speech QC</span>
         </div>
 
         <div className="space-y-1 text-[11px]">
           <div className="flex items-center justify-between py-1 border-b border-white/5">
             <span className="text-slate-400">Script Verification:</span>
-            <span className={isDevanagari ? 'text-emerald-400 font-mono' : isLatin ? 'text-sky-400 font-mono' : 'text-amber-400 font-mono'}>
-              {isDevanagari ? 'Devanagari (hi)' : isLatin ? 'Lowercase Latin (en)' : 'Special Marker / Mixed'}
+            <span className="text-emerald-400 font-mono">
+              {getScriptLabel(segment.text)}
             </span>
           </div>
 

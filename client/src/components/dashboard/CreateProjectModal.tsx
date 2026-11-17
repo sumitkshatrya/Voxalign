@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, FolderPlus, Sparkles, ShieldCheck } from 'lucide-react';
 import { projectApi } from '../../services/api';
-import { Project } from '../../types';
+import { Project, LanguageCode, GuidelinesProfile, SUPPORTED_LANGUAGES } from '../../types';
 
 interface CreateProjectModalProps {
   isOpen: boolean;
@@ -16,8 +16,8 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
 }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [targetLanguage, setTargetLanguage] = useState<'hi-en' | 'hi' | 'en'>('hi-en');
-  const [guidelinesProfile, setGuidelinesProfile] = useState<'hindi_hi_IN' | 'general'>('hindi_hi_IN');
+  const [targetLanguage, setTargetLanguage] = useState<LanguageCode>('hi-en');
+  const [guidelinesProfile, setGuidelinesProfile] = useState<GuidelinesProfile>('indic_multilingual');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -119,12 +119,26 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
               </label>
               <select
                 value={targetLanguage}
-                onChange={(e) => setTargetLanguage(e.target.value as any)}
+                onChange={(e) => setTargetLanguage(e.target.value as LanguageCode)}
                 className="w-full bg-[#0B1422] border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-[#52DDBB]"
               >
-                <option value="hi-en">Hindi-English (Hinglish)</option>
-                <option value="hi">Pure Hindi (hi_IN)</option>
-                <option value="en">English (en)</option>
+                <optgroup label="Indic Languages">
+                  {SUPPORTED_LANGUAGES.filter(l => ['hi', 'hi-en', 'bn', 'ta', 'te', 'mr', 'gu', 'kn', 'ml', 'pa', 'or', 'ur', 'as'].includes(l.code)).map(lang => (
+                    <option key={lang.code} value={lang.code}>
+                      {lang.name} ({lang.nativeName})
+                    </option>
+                  ))}
+                </optgroup>
+                <optgroup label="Global Languages">
+                  {SUPPORTED_LANGUAGES.filter(l => ['en', 'es', 'fr', 'de', 'ar'].includes(l.code)).map(lang => (
+                    <option key={lang.code} value={lang.code}>
+                      {lang.name} ({lang.nativeName})
+                    </option>
+                  ))}
+                </optgroup>
+                <optgroup label="Multilingual">
+                  <option value="multilingual">Multilingual / Mixed Audio</option>
+                </optgroup>
               </select>
             </div>
 
@@ -134,10 +148,11 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
               </label>
               <select
                 value={guidelinesProfile}
-                onChange={(e) => setGuidelinesProfile(e.target.value as any)}
+                onChange={(e) => setGuidelinesProfile(e.target.value as GuidelinesProfile)}
                 className="w-full bg-[#0B1422] border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-[#52DDBB]"
               >
-                <option value="hindi_hi_IN">Hindi Alignment (hi_IN)</option>
+                <option value="indic_multilingual">Indic Multilingual Quality Rules</option>
+                <option value="hindi_hi_IN">Hindi Alignment (hi_IN Page 17 Rules)</option>
                 <option value="general">General Standard</option>
               </select>
             </div>
@@ -146,7 +161,9 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
           <div className="p-3 rounded-xl bg-white/5 border border-white/5 text-[11px] text-[#94A3B8] flex items-start gap-2">
             <ShieldCheck className="w-4 h-4 text-[#52DDBB] shrink-0 mt-0.5" />
             <span>
-              The <strong>Hindi Alignment (hi_IN)</strong> profile enforces Page 17 rules: single-word segmentation, Devanagari numerals exclusion, canonical hesitation अं, and unsplit compound separation.
+              {guidelinesProfile === 'hindi_hi_IN'
+                ? 'The Hindi Alignment (hi_IN) profile strictly enforces single-word segmentation, Devanagari numerals conversion, canonical hesitation अं, and unsplit compound separation.'
+                : 'The Indic Multilingual Quality profile validates script consistency (Devanagari, Bengali, Tamil, Telugu, etc.), digit conversion, and speech disfluency tags across 14+ languages.'}
             </span>
           </div>
 

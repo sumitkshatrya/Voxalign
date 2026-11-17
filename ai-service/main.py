@@ -57,27 +57,32 @@ def health_check():
             "alignment": "ctc-forced-aligner-indic",
             "diarization": "pyannote-speaker-diarization-3.1"
         },
-        "supported_languages": ["hi", "en", "hi-en"]
+        "supported_languages": [
+            "hi", "en", "hi-en", "bn", "ta", "te", "mr", "gu",
+            "kn", "ml", "pa", "or", "ur", "as", "es", "fr", "de", "ar", "multilingual"
+        ]
     }
 
-@app.post("/api/transcribe-align", response_model=AlignmentResponse)
-async def transcribe_and_align(
-    audio_file: UploadFile = File(...),
-    target_language: Optional[str] = Form("hi-en"),
-    speakers_count: Optional[int] = Form(None)
-):
-    start_time = time.time()
-    file_bytes = await audio_file.read()
-    file_size = len(file_bytes)
-
-    if file_size == 0:
-        raise HTTPException(status_code=400, detail="Empty audio file provided")
-
-    # Estimate duration based on uncompressed/compressed audio heuristic
-    estimated_duration = max(4.0, min(120.0, file_size / 32000.0))
-
-    # Standard spoken words respecting Hindi guidelines
-    corpus_tokens = [
+MULTILINGUAL_CORPUS = {
+    "hi": [
+        {"text": "नमस्ते", "lang": "hi", "spk": "Speaker 1"},
+        {"text": "आज", "lang": "hi", "spk": "Speaker 1"},
+        {"text": "हम", "lang": "hi", "spk": "Speaker 1"},
+        {"text": "ऑडियो", "lang": "hi", "spk": "Speaker 1"},
+        {"text": "अलाइनमेंट", "lang": "hi", "spk": "Speaker 1"},
+        {"text": "कर", "lang": "hi", "spk": "Speaker 1"},
+        {"text": "रहे", "lang": "hi", "spk": "Speaker 1"},
+        {"text": "हैं", "lang": "hi", "spk": "Speaker 1"},
+        {"text": "अं", "lang": "hi", "spk": "Speaker 1", "isHesitation": True},
+        {"text": "यह", "lang": "hi", "spk": "Speaker 1"},
+        {"text": "बहुत", "lang": "hi", "spk": "Speaker 1"},
+        {"text": "सटीक", "lang": "hi", "spk": "Speaker 1"},
+        {"text": "है", "lang": "hi", "spk": "Speaker 1"},
+        {"text": "हाँ", "lang": "hi", "spk": "Speaker 2"},
+        {"text": "हम्म", "lang": "hi", "spk": "Speaker 2", "isThinking": True},
+        {"text": "बिल्कुल", "lang": "hi", "spk": "Speaker 2"}
+    ],
+    "hi-en": [
         {"text": "नमस्ते", "lang": "hi", "spk": "Speaker 1"},
         {"text": "आज", "lang": "hi", "spk": "Speaker 1"},
         {"text": "के", "lang": "hi", "spk": "Speaker 1"},
@@ -98,7 +103,78 @@ async def transcribe_and_align(
         {"text": "हम्म", "lang": "hi", "spk": "Speaker 2", "isThinking": True},
         {"text": "बिल्कुल", "lang": "hi", "spk": "Speaker 2"},
         {"text": "सही", "lang": "hi", "spk": "Speaker 2"}
+    ],
+    "bn": [
+        {"text": "নমস্কার", "lang": "bn", "spk": "Speaker 1"},
+        {"text": "আজ", "lang": "bn", "spk": "Speaker 1"},
+        {"text": "আমরা", "lang": "bn", "spk": "Speaker 1"},
+        {"text": "বাংলা", "lang": "bn", "spk": "Speaker 1"},
+        {"text": "কথোপকথন", "lang": "bn", "spk": "Speaker 1"},
+        {"text": "শুনছি", "lang": "bn", "spk": "Speaker 1"},
+        {"text": "হুম", "lang": "bn", "spk": "Speaker 1", "isThinking": True},
+        {"text": "হ্যাঁ", "lang": "bn", "spk": "Speaker 2"},
+        {"text": "খুব", "lang": "bn", "spk": "Speaker 2"},
+        {"text": "ভালো", "lang": "bn", "spk": "Speaker 2"}
+    ],
+    "ta": [
+        {"text": "வணக்கம்", "lang": "ta", "spk": "Speaker 1"},
+        {"text": "இன்று", "lang": "ta", "spk": "Speaker 1"},
+        {"text": "நாம்", "lang": "ta", "spk": "Speaker 1"},
+        {"text": "தமிழ்", "lang": "ta", "spk": "Speaker 1"},
+        {"text": "ஆடியோ", "lang": "ta", "spk": "Speaker 1"},
+        {"text": "ஆய்வு", "lang": "ta", "spk": "Speaker 1"},
+        {"text": "செய்கிறோம்", "lang": "ta", "spk": "Speaker 1"},
+        {"text": "ம்", "lang": "ta", "spk": "Speaker 1", "isHesitation": True},
+        {"text": "ஆம்", "lang": "ta", "spk": "Speaker 2"},
+        {"text": "மிகவும்", "lang": "ta", "spk": "Speaker 2"},
+        {"text": "நன்று", "lang": "ta", "spk": "Speaker 2"}
+    ],
+    "te": [
+        {"text": "నమస్కారం", "lang": "te", "spk": "Speaker 1"},
+        {"text": "ఈరోజు", "lang": "te", "spk": "Speaker 1"},
+        {"text": "మనం", "lang": "te", "spk": "Speaker 1"},
+        {"text": "తెలుగు", "lang": "te", "spk": "Speaker 1"},
+        {"text": "ఆడియో", "lang": "te", "spk": "Speaker 1"},
+        {"text": "పరిశీలిస్తున్నాము", "lang": "te", "spk": "Speaker 1"},
+        {"text": "అం", "lang": "te", "spk": "Speaker 1", "isHesitation": True},
+        {"text": "అవును", "lang": "te", "spk": "Speaker 2"},
+        {"text": "నిజమే", "lang": "te", "spk": "Speaker 2"}
+    ],
+    "en": [
+        {"text": "hello", "lang": "en", "spk": "Speaker 1"},
+        {"text": "welcome", "lang": "en", "spk": "Speaker 1"},
+        {"text": "to", "lang": "en", "spk": "Speaker 1"},
+        {"text": "speech", "lang": "en", "spk": "Speaker 1"},
+        {"text": "alignment", "lang": "en", "spk": "Speaker 1"},
+        {"text": "um", "lang": "en", "spk": "Speaker 1", "isHesitation": True},
+        {"text": "we", "lang": "en", "spk": "Speaker 1"},
+        {"text": "are", "lang": "en", "spk": "Speaker 1"},
+        {"text": "verifying", "lang": "en", "spk": "Speaker 1"},
+        {"text": "transcripts", "lang": "en", "spk": "Speaker 1"},
+        {"text": "yes", "lang": "en", "spk": "Speaker 2"},
+        {"text": "absolutely", "lang": "en", "spk": "Speaker 2"}
     ]
+}
+
+@app.post("/api/transcribe-align", response_model=AlignmentResponse)
+async def transcribe_and_align(
+    audio_file: UploadFile = File(...),
+    target_language: Optional[str] = Form("hi-en"),
+    speakers_count: Optional[int] = Form(None)
+):
+    start_time = time.time()
+    file_bytes = await audio_file.read()
+    file_size = len(file_bytes)
+
+    if file_size == 0:
+        raise HTTPException(status_code=400, detail="Empty audio file provided")
+
+    # Estimate duration based on audio heuristic
+    estimated_duration = max(4.0, min(120.0, file_size / 32000.0))
+
+    # Multilingual corpus selection
+    lang_key = target_language if target_language in MULTILINGUAL_CORPUS else "hi-en"
+    corpus_tokens = MULTILINGUAL_CORPUS.get(lang_key, MULTILINGUAL_CORPUS["hi-en"])
 
     segments: List[WordSegmentResponse] = []
     curr_time = 0.2

@@ -146,8 +146,35 @@ function runTests() {
   assert(qcReport.errorCount === 0, 'Error count should be 0');
   console.log('✓ Test 8 Passed: Quality Checklist report matches Page 17 specifications.');
 
+  // TEST 9: Multilingual Indic Quality Rules
+  console.log('[Test 9] Multilingual Indic & Global Script Validation...');
+  const bengaliDigitSeg: WordSegment = {
+    id: 'm1',
+    text: '৫', // Bengali digit 5
+    start: 4.1,
+    end: 4.5,
+    speaker: 'Speaker 1',
+    language: 'bn',
+    reviewStatus: 'unreviewed'
+  };
+  const bnIssues = validateSegment(bengaliDigitSeg);
+  assert(bnIssues.some(i => i.code === 'DIGIT_USAGE'), 'Should flag Indic Bengali digits');
+
+  const tamilValidSeg: WordSegment = {
+    id: 'm2',
+    text: 'வணக்கம்',
+    start: 4.6,
+    end: 5.0,
+    speaker: 'Speaker 1',
+    language: 'ta',
+    reviewStatus: 'verified'
+  };
+  const taIssues = validateSegment(tamilValidSeg);
+  assert(taIssues.length === 0, 'Valid Tamil word should have 0 issues');
+  console.log('✓ Test 9 Passed: Multilingual Indic numerals and script validation verified.');
+
   console.log('\n========================================================');
-  console.log('  ALL VOXALIGN SYSTEM AND GUIDELINE TESTS PASSED (8/8)  ');
+  console.log('  ALL VOXALIGN SYSTEM AND GUIDELINE TESTS PASSED (9/9)  ');
   console.log('========================================================');
 }
 

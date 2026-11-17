@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
-import { Project, AudioFile, WordSegment, QualityChecklistReport } from '../types';
+import { Project, AudioFile, WordSegment, QualityChecklistReport, LanguageCode } from '../types';
 import { validateClientSegment, generateClientQcReport } from '../utils/hindiValidator';
 import { audioApi } from '../services/api';
 
@@ -34,6 +34,7 @@ interface WorkspaceState {
   updateSegmentText: (id: string, text: string) => void;
   updateSegmentTimestamps: (id: string, start: number, end: number) => void;
   updateSegmentSpeaker: (id: string, speaker: string) => void;
+  updateSegmentLanguage: (id: string, language: LanguageCode) => void;
   toggleSegmentStatus: (id: string) => void;
   splitSegmentAtCurrentTime: (segmentId?: string) => void;
   mergeWithNextSegment: (segmentId: string) => void;
@@ -160,6 +161,28 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
     set({
       segments: updated,
       speakers: updatedSpeakers,
+      undoStack: [...undoStack, currentSnapshot],
+      redoStack: [],
+      qcReport: qc
+    });
+  },
+
+  updateSegmentLanguage: (id, language) => {
+    const { segments, undoStack } = get();
+    const currentSnapshot = JSON.parse(JSON.stringify(segments));
+
+    const updated = segments.map(seg => {
+      if (seg.id === id) {
+        const modified = { ...seg, language };
+        modified.validationIssues = validateClientSegment(modified, segments);
+        return modified;
+      }
+      return seg;
+    });
+
+    const qc = generateClientQcReport(updated, get().currentFile?.id || '');
+    set({
+      segments: updated,
       undoStack: [...undoStack, currentSnapshot],
       redoStack: [],
       qcReport: qc

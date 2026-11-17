@@ -34,7 +34,59 @@ export type SegmentReviewStatus =
   | 'flagged'
   | 'needs_resegmentation';
 
-export type LanguageCode = 'hi' | 'en' | 'hi-en'; // Hindi, English, Hinglish
+// Multilingual Speech Codes (Indic + Global)
+export type LanguageCode = 
+  | 'hi'          // Hindi (हिन्दी)
+  | 'en'          // English
+  | 'hi-en'       // Hinglish (Hindi-English code-switched)
+  | 'bn'          // Bengali (বাংলা)
+  | 'ta'          // Tamil (தமிழ்)
+  | 'te'          // Telugu (తెలుగు)
+  | 'mr'          // Marathi (मराठी)
+  | 'gu'          // Gujarati (ગુજરાતી)
+  | 'kn'          // Kannada (ಕನ್ನಡ)
+  | 'ml'          // Malayalam (മലയാളം)
+  | 'pa'          // Punjabi (ਪੰਜਾਬੀ)
+  | 'or'          // Odia (ଓଡ଼ିଆ)
+  | 'ur'          // Urdu (اردو)
+  | 'as'          // Assamese (অসমীয়া)
+  | 'es'          // Spanish (Español)
+  | 'fr'          // French (Français)
+  | 'de'          // German (Deutsch)
+  | 'ar'          // Arabic (العربية)
+  | 'multilingual'; // Mixed Multilingual Speech
+
+export interface LanguageDefinition {
+  code: LanguageCode;
+  name: string;
+  nativeName: string;
+  family: 'indic' | 'dravidian' | 'european' | 'semitic' | 'mixed';
+  scriptName: string;
+  hesitationToken: string;
+  thinkingToken: string;
+}
+
+export const SUPPORTED_LANGUAGES: LanguageDefinition[] = [
+  { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', family: 'indic', scriptName: 'Devanagari', hesitationToken: 'अं', thinkingToken: 'हम्म' },
+  { code: 'hi-en', name: 'Hinglish', nativeName: 'हिन्दी + English', family: 'mixed', scriptName: 'Devanagari / Latin', hesitationToken: 'अं', thinkingToken: 'हम्म' },
+  { code: 'en', name: 'English', nativeName: 'English', family: 'european', scriptName: 'Latin', hesitationToken: 'um', thinkingToken: 'hmm' },
+  { code: 'bn', name: 'Bengali', nativeName: 'বাংলা', family: 'indic', scriptName: 'Bengali', hesitationToken: 'অ্যাঁ', thinkingToken: 'হুম' },
+  { code: 'ta', name: 'Tamil', nativeName: 'தமிழ்', family: 'dravidian', scriptName: 'Tamil', hesitationToken: 'ம்', thinkingToken: 'ஆங்' },
+  { code: 'te', name: 'Telugu', nativeName: 'తెలుగు', family: 'dravidian', scriptName: 'Telugu', hesitationToken: 'అం', thinkingToken: 'హ్మ్' },
+  { code: 'mr', name: 'Marathi', nativeName: 'मराठी', family: 'indic', scriptName: 'Devanagari', hesitationToken: 'अं', thinkingToken: 'हम्म' },
+  { code: 'gu', name: 'Gujarati', nativeName: 'ગુજરાતી', family: 'indic', scriptName: 'Gujarati', hesitationToken: 'અં', thinkingToken: 'હમ્મ' },
+  { code: 'kn', name: 'Kannada', nativeName: 'ಕನ್ನಡ', family: 'dravidian', scriptName: 'Kannada', hesitationToken: 'ಅಂ', thinkingToken: 'ಹ್ಮ್' },
+  { code: 'ml', name: 'Malayalam', nativeName: 'മലയാളം', family: 'dravidian', scriptName: 'Malayalam', hesitationToken: 'മ്', thinkingToken: 'ഹ്മ്' },
+  { code: 'pa', name: 'Punjabi', nativeName: 'ਪੰਜਾਬੀ', family: 'indic', scriptName: 'Gurmukhi', hesitationToken: 'ਅੰ', thinkingToken: 'ਹੰਮ' },
+  { code: 'or', name: 'Odia', nativeName: 'ଓଡ଼ିଆ', family: 'indic', scriptName: 'Odia', hesitationToken: 'ଉଁ', thinkingToken: 'ହୁଁ' },
+  { code: 'ur', name: 'Urdu', nativeName: 'اردو', family: 'indic', scriptName: 'Perso-Arabic', hesitationToken: 'اں', thinkingToken: 'ہمم' },
+  { code: 'as', name: 'Assamese', nativeName: 'অসমীয়া', family: 'indic', scriptName: 'Assamese', hesitationToken: 'অঁ', thinkingToken: 'হুম' },
+  { code: 'es', name: 'Spanish', nativeName: 'Español', family: 'european', scriptName: 'Latin', hesitationToken: 'eh', thinkingToken: 'mmm' },
+  { code: 'fr', name: 'French', nativeName: 'Français', family: 'european', scriptName: 'Latin', hesitationToken: 'euh', thinkingToken: 'hum' },
+  { code: 'de', name: 'German', nativeName: 'Deutsch', family: 'european', scriptName: 'Latin', hesitationToken: 'äh', thinkingToken: 'mhm' },
+  { code: 'ar', name: 'Arabic', nativeName: 'العربية', family: 'semitic', scriptName: 'Arabic', hesitationToken: 'امم', thinkingToken: 'همم' },
+  { code: 'multilingual', name: 'Multilingual / Code-Switched', nativeName: 'Multilingual', family: 'mixed', scriptName: 'Mixed Scripts', hesitationToken: 'अं', thinkingToken: 'हम्म' }
+];
 
 export interface WordSegment {
   id: string;
@@ -102,13 +154,18 @@ export interface AudioFile {
   updatedAt: string;
 }
 
+export type GuidelinesProfile = 
+  | 'hindi_hi_IN'
+  | 'indic_multilingual'
+  | 'general';
+
 export interface Project {
   id: string;
   userId: string;
   name: string;
   description?: string;
   targetLanguage: LanguageCode;
-  guidelinesProfile: 'hindi_hi_IN' | 'general';
+  guidelinesProfile: GuidelinesProfile;
   audioFilesCount: number;
   totalDurationSeconds: number;
   status: 'active' | 'archived';

@@ -1,13 +1,26 @@
-import { WordSegment, ValidationIssue, QualityChecklistReport } from '../types';
+import { WordSegment, ValidationIssue, QualityChecklistReport, LanguageCode } from '../types';
 
 export const DEVANAGARI_REGEX = /^[\u0900-\u097F]+$/;
+export const BENGALI_REGEX = /^[\u0980-\u09FF]+$/;
+export const TAMIL_REGEX = /^[\u0B80-\u0BFF]+$/;
+export const TELUGU_REGEX = /^[\u0C00-\u0C7F]+$/;
+export const GUJARATI_REGEX = /^[\u0A80-\u0AFF]+$/;
+export const KANNADA_REGEX = /^[\u0C80-\u0CFF]+$/;
+export const MALAYALAM_REGEX = /^[\u0D00-\u0D7F]+$/;
+export const GURMUKHI_REGEX = /^[\u0A00-\u0A7F]+$/;
+export const ODIA_REGEX = /^[\u0B00-\u0B7F]+$/;
+export const ARABIC_URDU_REGEX = /^[\u0600-\u06FF]+$/;
 export const LATIN_LOWERCASE_REGEX = /^[a-z]+(?:'[a-z]+)?$/;
+
 export const ARABIC_DIGITS_REGEX = /[0-9]/;
 export const DEVANAGARI_DIGITS_REGEX = /[\u0966-\u096F]/;
+// All digit scripts across Indic & Arabic Unicode blocks
+export const ALL_DIGITS_REGEX = /[0-9\u0966-\u096F\u09E6-\u09EF\u0A66-\u0A6F\u0AE6-\u0AEF\u0B66-\u0B6F\u0BE6-\u0BEF\u0C66-\u0C6F\u0CE6-\u0CEF\u0D66-\u0D6F\u0660-\u0669]/;
+
 export const PUNCTUATION_REGEX = /[.,!?;:\"()[\]{}]/;
 export const UNINTELLIGIBLE_REGEX = /^\(\(\)\)$/;
 export const PLAUSIBLE_GUESS_REGEX = /^\(\([^\(\)]+\)\)$/;
-export const CUTOFF_REGEX = /^[a-z\u0900-\u097F]+-$/;
+export const CUTOFF_REGEX = /^[a-z\u0900-\u0D7F\u0600-\u06FF]+-$/i;
 
 export const CANONICAL_HINDI_HESITATION = 'अं';
 export const CANONICAL_HINDI_THINKING = 'हम्म';
@@ -25,9 +38,81 @@ export const HINDI_NUMBER_WORDS: Record<string, string> = {
   '20': 'बीस', '25': 'पच्चीस', '50': 'पचास', '100': 'सौ', '1000': 'हज़ार'
 };
 
-export function validateClientSegment(segment: WordSegment, allSegments: WordSegment[] = []): ValidationIssue[] {
+export const BENGALI_NUMBER_WORDS: Record<string, string> = {
+  '0': 'শূন্য', '1': 'এক', '2': 'দুই', '3': 'তিন', '4': 'চার',
+  '5': 'পাঁচ', '6': 'ছয়', '7': 'সাত', '8': 'আট', '9': 'নয়',
+  '10': 'দশ', '15': 'পনেরো', '20': 'কুড়ি', '50': 'পঞ্চাশ', '100': 'একশো'
+};
+
+export const TAMIL_NUMBER_WORDS: Record<string, string> = {
+  '0': 'பூஜ்ஜியம்', '1': 'ஒன்று', '2': 'இரண்டு', '3': 'மூன்று', '4': 'நான்கு',
+  '5': 'ஐந்து', '6': 'ஆறு', '7': 'ஏழு', '8': 'எட்டு', '9': 'ஒன்பது',
+  '10': 'பத்து', '15': 'பதினைந்து', '20': 'இருபது', '50': 'ஐம்பது', '100': 'நூறு'
+};
+
+export const TELUGU_NUMBER_WORDS: Record<string, string> = {
+  '0': 'సున్నా', '1': 'ఒకటి', '2': 'రెండు', '3': 'మూడు', '4': 'నాలుగు',
+  '5': 'ఐదు', '6': 'ఆరు', '7': 'ఏడు', '8': 'ఎనిమిది', '9': 'తొమ్మిది',
+  '10': 'పది', '15': 'పదిహేను', '20': 'ఇరవై', '50': 'యాభై', '100': 'వంద'
+};
+
+export const MARATHI_NUMBER_WORDS: Record<string, string> = {
+  '0': 'शून्य', '1': 'एक', '2': 'दोन', '3': 'तीन', '4': 'चार',
+  '5': 'पाच', '6': 'सहा', '7': 'सात', '8': 'आठ', '9': 'नऊ',
+  '10': 'दहा', '15': 'पंधरा', '20': 'वीस', '50': 'पन्नास', '100': 'शंभर'
+};
+
+export const GUJARATI_NUMBER_WORDS: Record<string, string> = {
+  '0': 'શૂન્ય', '1': 'એક', '2': 'બે', '3': 'ત્રણ', '4': 'ચાર',
+  '5': 'પાંચ', '6': 'છ', '7': 'સાત', '8': 'આઠ', '9': 'નવ',
+  '10': 'દસ', '15': 'પંદર', '20': 'વીસ', '50': 'પચાસ', '100': 'સો'
+};
+
+export const PUNJABI_NUMBER_WORDS: Record<string, string> = {
+  '0': 'ਸਿਫ਼ਰ', '1': 'ਇੱਕ', '2': 'ਦੋ', '3': 'ਤਿੰਨ', '4': 'ਚਾਰ',
+  '5': 'ਪੰਜ', '6': 'ਛੇ', '7': 'ਸੱਤ', '8': 'ਅੱਠ', '9': 'ਨੌਂ',
+  '10': 'ਦਸ', '15': 'ਪੰਦਰਾਂ', '20': 'ਵੀਹ', '50': 'ਪੰਜਾਹ', '100': 'ਸੌ'
+};
+
+export const ENGLISH_NUMBER_WORDS: Record<string, string> = {
+  '0': 'zero', '1': 'one', '2': 'two', '3': 'three', '4': 'four',
+  '5': 'five', '6': 'six', '7': 'seven', '8': 'eight', '9': 'nine',
+  '10': 'ten', '11': 'eleven', '12': 'twelve', '13': 'thirteen',
+  '15': 'fifteen', '20': 'twenty', '30': 'thirty', '50': 'fifty', '100': 'hundred'
+};
+
+export function getClientNumberDictionary(lang?: LanguageCode): Record<string, string> {
+  switch (lang) {
+    case 'bn':
+    case 'as':
+      return BENGALI_NUMBER_WORDS;
+    case 'ta':
+      return TAMIL_NUMBER_WORDS;
+    case 'te':
+      return TELUGU_NUMBER_WORDS;
+    case 'mr':
+      return MARATHI_NUMBER_WORDS;
+    case 'gu':
+      return GUJARATI_NUMBER_WORDS;
+    case 'pa':
+      return PUNJABI_NUMBER_WORDS;
+    case 'en':
+      return ENGLISH_NUMBER_WORDS;
+    case 'hi':
+    case 'hi-en':
+    default:
+      return HINDI_NUMBER_WORDS;
+  }
+}
+
+export function validateClientSegment(
+  segment: WordSegment, 
+  allSegments: WordSegment[] = [],
+  targetLang?: LanguageCode
+): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
   const rawText = (segment.text || '').trim();
+  const effectiveLang = segment.language || targetLang || 'hi-en';
 
   if (!rawText) {
     issues.push({
@@ -51,32 +136,33 @@ export function validateClientSegment(segment: WordSegment, allSegments: WordSeg
   }
 
   // Ordinary compound hyphens removed and components split
-  if (rawText.includes('-') && !rawText.endsWith('-')) {
+  if (rawText.includes('-') && !rawText.endsWith('-') && !rawText.startsWith('-')) {
     issues.push({
       code: 'HYPHEN_COMPOUND',
       message: `Ordinary compound hyphen detected ("${rawText}"). Components must be split into separate segments.`,
       severity: 'error',
       ruleCategory: 'guideline_compliance',
-      suggestedFix: 'Split components into individual words.'
+      suggestedFix: rawText.replace(/-/g, ' ')
     });
   }
 
-  // Digits prohibited
-  if (ARABIC_DIGITS_REGEX.test(rawText) || DEVANAGARI_DIGITS_REGEX.test(rawText)) {
+  // Digits prohibited across all Indic and Arabic scripts
+  if (ALL_DIGITS_REGEX.test(rawText)) {
     const digitMatch = rawText.match(/\d+/)?.[0];
-    const suggestion = digitMatch && HINDI_NUMBER_WORDS[digitMatch] ? HINDI_NUMBER_WORDS[digitMatch] : undefined;
+    const dict = getClientNumberDictionary(effectiveLang);
+    const suggestion = digitMatch && dict[digitMatch] ? dict[digitMatch] : undefined;
     issues.push({
       code: 'DIGIT_USAGE',
       message: `Digits detected ("${rawText}"). Numbers must be spelled out in spoken words.`,
       severity: 'error',
       ruleCategory: 'script',
-      suggestedFix: suggestion ? `Use '${suggestion}'` : 'Spell out number in words.'
+      suggestedFix: suggestion ? `Use '${suggestion}'` : 'Spell out number in native letters.'
     });
   }
 
   const isUnintelligible = UNINTELLIGIBLE_REGEX.test(rawText);
   const isPlausibleGuess = PLAUSIBLE_GUESS_REGEX.test(rawText);
-  const isCutOff = CUTOFF_REGEX.test(rawText);
+  const isCutOff = CUTOFF_REGEX.test(rawText) || (rawText.startsWith('-') && rawText.length > 1);
 
   if (!isUnintelligible && !isPlausibleGuess) {
     // Non-lexical sound
@@ -90,25 +176,26 @@ export function validateClientSegment(segment: WordSegment, allSegments: WordSeg
     }
 
     // Punctuation check
-    const cleanedForCutoff = isCutOff ? rawText.slice(0, -1) : rawText;
-    if (PUNCTUATION_REGEX.test(cleanedForCutoff)) {
+    const cleanedForCutoff = isCutOff ? rawText.replace(/^-|-$/g, '') : rawText;
+    const isSingleLetterWithPeriod = /^[a-z]\.$/.test(rawText);
+    if (!isSingleLetterWithPeriod && PUNCTUATION_REGEX.test(cleanedForCutoff)) {
       issues.push({
         code: 'PUNCTUATION_DETECTED',
         message: `Punctuation mark found in "${rawText}". Standard transcripts omit punctuation marks.`,
         severity: 'error',
         ruleCategory: 'script',
-        suggestedFix: 'Remove punctuation mark.'
+        suggestedFix: rawText.replace(/[.,!?;:\"()[\]{}]/g, '')
       });
     }
 
     // Script checking
     const hasEnglishLetters = /[a-zA-Z]/.test(rawText);
-    const hasDevanagariLetters = /[\u0900-\u097F]/.test(rawText);
+    const hasIndicLetters = /[\u0900-\u0D7F\u0600-\u06FF]/.test(rawText);
 
-    if (hasEnglishLetters && hasDevanagariLetters) {
+    if (hasEnglishLetters && hasIndicLetters) {
       issues.push({
         code: 'MIXED_SCRIPT',
-        message: `Mixed Devanagari and Latin script inside word ("${rawText}").`,
+        message: `Mixed native Indic and Latin script inside word ("${rawText}").`,
         severity: 'warning',
         ruleCategory: 'script'
       });
@@ -122,24 +209,27 @@ export function validateClientSegment(segment: WordSegment, allSegments: WordSeg
           suggestedFix: rawText.toLowerCase()
         });
       }
-    } else if (hasDevanagariLetters) {
-      if (['उम', 'उम्म', 'अम्म', 'अह'].includes(rawText)) {
-        issues.push({
-          code: 'NON_CANONICAL_HESITATION',
-          message: `Non-standard hesitation. Canonical Hindi hesitation filler is '${CANONICAL_HINDI_HESITATION}'.`,
-          severity: 'warning',
-          ruleCategory: 'guideline_compliance',
-          suggestedFix: CANONICAL_HINDI_HESITATION
-        });
-      }
-      if (['हम', 'हम्मम', 'ह्म्म'].includes(rawText)) {
-        issues.push({
-          code: 'NON_CANONICAL_THINKING',
-          message: `Non-standard thinking signal. Canonical Hindi thinking signal is '${CANONICAL_HINDI_THINKING}'.`,
-          severity: 'warning',
-          ruleCategory: 'guideline_compliance',
-          suggestedFix: CANONICAL_HINDI_THINKING
-        });
+    } else if (hasIndicLetters) {
+      // Devanagari hesitation checks
+      if (/[\u0900-\u097F]/.test(rawText)) {
+        if (['उम', 'उम्म', 'अम्म', 'अह'].includes(rawText)) {
+          issues.push({
+            code: 'NON_CANONICAL_HESITATION',
+            message: `Non-standard hesitation. Canonical hesitation filler is '${CANONICAL_HINDI_HESITATION}'.`,
+            severity: 'warning',
+            ruleCategory: 'guideline_compliance',
+            suggestedFix: CANONICAL_HINDI_HESITATION
+          });
+        }
+        if (['हम', 'हम्मम', 'ह्म्म'].includes(rawText)) {
+          issues.push({
+            code: 'NON_CANONICAL_THINKING',
+            message: `Non-standard thinking signal. Canonical thinking signal is '${CANONICAL_HINDI_THINKING}'.`,
+            severity: 'warning',
+            ruleCategory: 'guideline_compliance',
+            suggestedFix: CANONICAL_HINDI_THINKING
+          });
+        }
       }
     }
   }
@@ -196,12 +286,16 @@ export function validateClientSegment(segment: WordSegment, allSegments: WordSeg
   return issues;
 }
 
-export function generateClientQcReport(segments: WordSegment[], fileId: string = ''): QualityChecklistReport {
+export function generateClientQcReport(
+  segments: WordSegment[], 
+  fileId: string = '',
+  targetLang: LanguageCode = 'hi-en'
+): QualityChecklistReport {
   let totalErrors = 0;
   let totalWarnings = 0;
 
   for (const seg of segments) {
-    const issues = validateClientSegment(seg, segments);
+    const issues = validateClientSegment(seg, segments, targetLang);
     seg.validationIssues = issues;
     for (const issue of issues) {
       if (issue.severity === 'error') totalErrors++;
@@ -211,9 +305,9 @@ export function generateClientQcReport(segments: WordSegment[], fileId: string =
 
   const hasNoEmpty = segments.every(s => (s.text || '').trim().length > 0);
   const hasNoMultiWords = segments.every(s => !/\s+/.test((s.text || '').trim()));
-  const hasNoDigits = segments.every(s => !ARABIC_DIGITS_REGEX.test(s.text) && !DEVANAGARI_DIGITS_REGEX.test(s.text));
+  const hasNoDigits = segments.every(s => !ALL_DIGITS_REGEX.test(s.text));
   const hasValidTimestamps = segments.every(s => s.start < s.end && s.start >= 0);
-  const hasNoUnsplitCompounds = segments.every(s => !s.text.includes('-') || s.text.endsWith('-'));
+  const hasNoUnsplitCompounds = segments.every(s => !s.text.includes('-') || s.text.endsWith('-') || s.text.startsWith('-'));
   const hasCanonicalMarkers = segments.every(s => !['उम', 'उम्म', 'अम्म'].includes(s.text.trim()));
   const hasLowercaseEnglish = segments.every(s => {
     const t = (s.text || '').trim();
@@ -233,7 +327,7 @@ export function generateClientQcReport(segments: WordSegment[], fileId: string =
     {
       id: 'chk_script_rules',
       label: 'Script & Casing Standards',
-      description: 'Hindi in Devanagari, English in lowercase Latin, No digits.',
+      description: 'Native script or lowercase Latin; digits spelled out.',
       passed: hasNoDigits && hasLowercaseEnglish
     },
     {
@@ -257,7 +351,7 @@ export function generateClientQcReport(segments: WordSegment[], fileId: string =
     {
       id: 'chk_markers',
       label: 'Standard Hesitation & Uncertainty Tags',
-      description: 'Hesitations use "अं", thinking signals use "हम्म", unintelligible uses "(())".',
+      description: 'Hesitations and uncertainty tags follow locale rules.',
       passed: hasCanonicalMarkers
     },
     {

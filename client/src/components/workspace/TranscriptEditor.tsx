@@ -185,6 +185,10 @@ export const TranscriptEditor: React.FC = () => {
                     <span className="font-mono text-[10px] text-slate-400">
                       [{seg.start.toFixed(2)}s - {seg.end.toFixed(2)}s]
                     </span>
+
+                    <span className="font-mono text-[9px] px-1.5 py-0.5 rounded bg-white/5 text-[#52DDBB] border border-white/10 uppercase" title={`Language: ${seg.language || 'hi'}`}>
+                      {seg.language || 'hi'}
+                    </span>
                   </div>
 
                   {/* Review status button */}
