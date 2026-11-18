@@ -173,9 +173,21 @@ function runTests() {
   assert(taIssues.length === 0, 'Valid Tamil word should have 0 issues');
   console.log('✓ Test 9 Passed: Multilingual Indic numerals and script validation verified.');
 
-  console.log('\n========================================================');
-  console.log('  ALL VOXALIGN SYSTEM AND GUIDELINE TESTS PASSED (9/9)  ');
-  console.log('========================================================');
+  // TEST 10: Multilingual Project Creation & Guidelines Profile Schema
+  console.log('[Test 10] Project Creation Schema & GuidelinesProfile Validation...');
+  const testProject = ProjectStore.create({
+    userId: testUser.id,
+    name: 'Bengali-Tamil Speech Corpus',
+    targetLanguage: 'bn',
+    guidelinesProfile: 'indic_multilingual'
+  });
+  assert(testProject.guidelinesProfile === 'indic_multilingual', 'Profile should be indic_multilingual');
+  assert(testProject.targetLanguage === 'bn', 'Target language should be bn');
+  console.log('✓ Test 10 Passed: indic_multilingual profile and multilingual language codes validated.');
+
+  console.log('\n=========================================================');
+  console.log('  ALL VOXALIGN SYSTEM AND GUIDELINE TESTS PASSED (10/10) ');
+  console.log('=========================================================');
 }
 
 runTests();

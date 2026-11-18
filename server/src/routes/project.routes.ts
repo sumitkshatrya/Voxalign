@@ -5,11 +5,18 @@ import { ProjectStore, AudioFileStore, AuditLogStore } from '../models/store';
 
 const router = Router();
 
+const VALID_LANGUAGES = [
+  'hi', 'en', 'hi-en', 'bn', 'ta', 'te', 'mr', 'gu',
+  'kn', 'ml', 'pa', 'or', 'ur', 'as', 'es', 'fr', 'de', 'ar', 'multilingual'
+] as const;
+
+const VALID_GUIDELINES = ['hindi_hi_IN', 'indic_multilingual', 'general'] as const;
+
 const projectSchema = z.object({
   name: z.string().min(2, 'Project name must be at least 2 characters'),
   description: z.string().optional(),
-  targetLanguage: z.enum(['hi', 'en', 'hi-en']).default('hi-en'),
-  guidelinesProfile: z.enum(['hindi_hi_IN', 'general']).default('hindi_hi_IN')
+  targetLanguage: z.enum(VALID_LANGUAGES).default('hi-en'),
+  guidelinesProfile: z.enum(VALID_GUIDELINES).default('indic_multilingual')
 });
 
 // Apply auth to all project routes
