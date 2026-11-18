@@ -4,7 +4,7 @@
   "description": "VoxAlign Backend API Server",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "node --max-old-space-size=4096 ./node_modules/typescript/bin/tsc",
     "start": "node dist/index.js",
     "dev": "nodemon --watch src --exec ts-node src/index.ts",
     "test": "node dist/test.js"
